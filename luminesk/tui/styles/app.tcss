@@ -1,0 +1,213 @@
+InputFormScreen {
+	align: center middle;
+}
+
+#dialog {
+	width: 84;
+	height: auto;
+	border: round #d38a2a;
+	background: #18202a;
+	padding: 1 2;
+}
+
+#dialog-title {
+	text-style: bold;
+	color: #fff3d1;
+	padding-bottom: 1;
+}
+
+#dialog-description {
+	color: #a9b8c8;
+	padding-bottom: 1;
+}
+
+.dialog-label {
+	padding-top: 1;
+	color: #cfd8e3;
+}
+
+Input {
+	border: round #40546a;
+	background: #10161d;
+}
+
+.dialog-buttons {
+	height: auto;
+	padding-top: 1;
+}
+
+.dialog-buttons Button {
+	margin-right: 1;
+}
+
+DoctorResultsScreen {
+	align: center middle;
+}
+
+#doctor-dialog {
+	width: 96;
+	height: 28;
+	border: round #4c8d9c;
+	background: #18202a;
+	padding: 1 2;
+}
+
+#doctor-title {
+	text-style: bold;
+	color: #dff8ff;
+	padding-bottom: 1;
+}
+
+#doctor-summary {
+	color: #a9b8c8;
+	padding-bottom: 1;
+}
+
+#doctor-table {
+	height: 1fr;
+}
+
+#doctor-buttons {
+	height: auto;
+	padding-top: 1;
+}
+
+Screen {
+	background: #0f141a;
+	color: #edf3fb;
+}
+
+Header {
+	background: #d38a2a;
+	color: #0f141a;
+	text-style: bold;
+}
+
+Footer {
+	background: #18202a;
+	color: #edf3fb;
+}
+
+#home-shell,
+#server-shell {
+	height: 1fr;
+	padding: 1 2;
+}
+
+.card {
+	background: #18202a;
+	border: round #33485f;
+	padding: 1 2;
+}
+
+.accent-card {
+	border: round #d38a2a;
+	background: #151e27;
+}
+
+.section-copy,
+.copy-block {
+	color: #a9b8c8;
+}
+
+.card-title {
+	text-style: bold;
+	color: #edf3fb;
+	padding-bottom: 1;
+}
+
+#home-content {
+	height: auto;
+}
+
+#status-banner,
+#progress-banner {
+	height: auto;
+	padding: 0 1 1 1;
+}
+
+#status-banner {
+	color: #edf3fb;
+}
+
+#progress-banner {
+	color: #dcb86f;
+}
+
+#home-main {
+	width: 2fr;
+	margin-right: 1;
+}
+
+#home-side {
+	width: 1fr;
+}
+
+.fill-card {
+	height: 1fr;
+}
+
+#servers-table {
+	height: 1fr;
+	margin-top: 1;
+}
+
+#action-stack {
+	height: auto;
+	padding-top: 1;
+}
+
+#action-stack Button {
+	width: 100%;
+	margin-bottom: 1;
+}
+
+#selection-card {
+	height: auto;
+	margin-bottom: 1;
+}
+
+#home-activity-card {
+	height: 11;
+	margin-top: 1;
+}
+
+#server-content {
+	height: 1fr;
+	layout: horizontal;
+}
+
+#server-info-column {
+	width: 1fr;
+	margin-right: 1;
+}
+
+#server-console-column {
+	width: 1fr;
+}
+
+#server-details-card,
+#server-console-card {
+	height: 1fr;
+}
+
+#server-details {
+	height: 1fr;
+}
+
+#home-activity-pane,
+#server-console {
+	height: 1fr;
+}
+
+#server-console {
+	margin-top: 1;
+	border: round #40546a;
+	background: #10161d;
+}
+
+#server-command-input {
+	margin-top: 1;
+	border: round #40546a;
+	background: #10161d;
+}

@@ -1,0 +1,103 @@
+name: CI + Release + Publish
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  test:
+    name: Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Install deps
+        run: pip install -e . pytest
+      - name: Run tests
+        run: pytest
+
+  build:
+    name: Build (${{ matrix.os }})
+    needs: test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install deps
+        run: pip install . pyinstaller
+      - name: Build + Test binary
+        shell: bash
+        run: |
+          case "$RUNNER_OS" in
+            Linux)   OS_NAME="linux" ;;
+            macOS)   OS_NAME="darwin" ;;
+            Windows) OS_NAME="windows" ;;
+          esac
+          ARCH=$(uname -m)
+          [[ "$ARCH" == "x86_64" ]] && ARCH="amd64"
+          [[ "$ARCH" == "aarch64" ]] && ARCH="arm64"
+
+          NAME="luminesk-$OS_NAME-$ARCH"
+          [[ "$RUNNER_OS" == "Windows" ]] && NAME="$NAME.exe"
+
+          echo "BINARY_NAME=$NAME" >> $GITHUB_ENV
+          pyinstaller --onefile luminesk/__main__.py --name "$NAME"
+
+          BIN="dist/$NAME"
+          chmod +x "$BIN" || true
+          ./"$BIN" --help
+          ./"$BIN" --version
+          ./"$BIN" doctor
+          ./"$BIN" create -n "CI-Test" -d "./test-server" -c "pnx" -t "test"
+          ./"$BIN" cores
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: binaries-${{ matrix.os }}
+          path: dist/${{ env.BINARY_NAME }}
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all_binaries
+          pattern: binaries-*
+          merge-multiple: true
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: all_binaries/*
+          generate_release_notes: true
+
+  publish-pypi:
+    name: Publish to PyPI
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+      - name: Build Package
+        run: uv build
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

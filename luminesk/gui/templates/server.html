@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block main_attrs %} data-server-tag="{{ server.tag }}" data-log-tail-limit="{{ log_tail_limit }}"{% endblock %}
+
+{% block content %}
+<section class="page-header">
+	<div>
+		<a class="secondary-link" href="/servers">← Back to servers</a>
+		<p class="eyebrow">Server</p>
+		<h1>{{ server.name }}</h1>
+		<p class="subtitle">{{ server.tag }} · {{ server.core_id }} · {{ server.path }}</p>
+	</div>
+	<div class="action-group">
+		<button class="button" data-action="start">Start</button>
+		<button class="button" data-action="stop">Stop</button>
+		<button class="button danger" data-action="kill">Kill</button>
+	</div>
+</section>
+<section class="details-grid">
+	<article class="panel">
+		<h2>Overview</h2>
+		<dl class="details-list">
+			<div><dt>Status</dt><dd><span class="badge {{ server.status_class }}">{{ server.status_label }}</span></dd></div>
+			<div><dt>PID</dt><dd>{{ server.pid }}</dd></div>
+			<div><dt>Core Version</dt><dd>{{ server.core_version }}</dd></div>
+			<div><dt>JAR</dt><dd>{{ server.jar_name }}</dd></div>
+			<div><dt>Path</dt><dd class="wrap">{{ server.path }}</dd></div>
+			<div><dt>Last Start</dt><dd>{{ server.last_started_at }}</dd></div>
+			<div><dt>Last Stop</dt><dd>{{ server.last_stopped_at }}</dd></div>
+			<div><dt>tmux Session</dt><dd>{{ server.tmux_session_name }}</dd></div>
+		</dl>
+	</article>
+	<article class="panel">
+		<h2>Console</h2>
+		<p class="panel-note">{{ command_hint }}</p>
+		<div class="feedback" id="action-feedback" hidden></div>
+		<form id="command-form" class="command-form">
+			<input id="command-input" name="command" type="text" placeholder="say hello" {% if not command_available %}disabled{% endif %} />
+			<button class="button" type="submit" {% if not command_available %}disabled{% endif %}>Send</button>
+		</form>
+		<div class="console-meta">
+			<span>Status: <strong id="console-status">{{ server.status_label }}</strong></span>
+			<span id="console-log-path">{{ log_path_display }}</span>
+		</div>
+		<pre class="console-output" id="console-output">{{ console_text }}</pre>
+	</article>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/server.js"></script>
+{% endblock %}

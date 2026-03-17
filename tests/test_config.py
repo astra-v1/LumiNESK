@@ -1,0 +1,69 @@
+from pathlib import Path
+
+import pytest
+from pydantic import ValidationError
+
+from luminesk.core import config
+
+
+def test_managed_server_normalizes_tag(tmp_path: Path) -> None:
+	server = config.ManagedServer(
+		name="Test",
+		tag=" MyTag ",
+		path=tmp_path,
+		core_id="nukkit",
+		jar_name="server.jar",
+	)
+	assert server.tag == "mytag"
+
+
+def test_managed_server_rejects_empty_name(tmp_path: Path) -> None:
+	with pytest.raises(ValidationError):
+		config.ManagedServer(
+			name=" ",
+			tag="ok",
+			path=tmp_path,
+			core_id="nukkit",
+			jar_name="server.jar",
+		)
+
+
+def test_get_server_by_directory_prefers_deepest_match(tmp_path: Path) -> None:
+	root = tmp_path / "servers"
+	server_a_path = root / "alpha"
+	server_b_path = root / "alpha" / "beta"
+
+	server_a = config.ManagedServer(
+		name="Alpha",
+		tag="alpha",
+		path=server_a_path,
+		core_id="nukkit",
+		jar_name="server.jar",
+	)
+	server_b = config.ManagedServer(
+		name="Beta",
+		tag="beta",
+		path=server_b_path,
+		core_id="nukkit",
+		jar_name="server.jar",
+	)
+
+	user_config = config.UserConfig(servers={server_a.tag: server_a, server_b.tag: server_b})
+	match = user_config.get_server_by_directory(server_b_path / "world")
+	assert match == server_b
+
+
+def test_migrate_legacy_config_creates_servers(tmp_path: Path) -> None:
+	legacy_dir = tmp_path / "legacy"
+	legacy_dir.mkdir()
+	jar = legacy_dir / "core.jar"
+	jar.write_text("test", encoding="utf-8")
+
+	data = {"server_tags": {"Legacy": str(legacy_dir)}}
+	migrated = config._migrate_legacy_config(data)
+
+	assert "server_tags" not in migrated
+	assert "servers" in migrated
+	servers = migrated["servers"]
+	assert "legacy" in servers
+	assert servers["legacy"]["jar_name"] == "core.jar"
